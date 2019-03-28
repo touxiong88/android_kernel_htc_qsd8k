@@ -2708,7 +2708,7 @@ error:
 }
 
 #ifdef CONFIG_MSM_CAMERA_V4L2
-int msm_v4l2_register(struct msm_v4l2_driver *drv)
+int msm_v4l2_register(struct msm_v4l2_driver *drv)//msm V4L2相关函数实现 填充V4L2结构函数
 {
 	/* FIXME: support multiple sensors */
 	if (list_empty(&msm_sensors))

@@ -708,10 +708,10 @@ static int msm_v4l2_video_dev_init(struct video_device *pvd)
 	pvd->release = msm_v4l2_release_dev;
 	pvd->minor = -1;
 	pvd->ioctl_ops = &msm_ioctl_ops;
-	return msm_v4l2_register(g_pmsm_v4l2_dev->drv);
+	return msm_v4l2_register(g_pmsm_v4l2_dev->drv);//注册MSM的V4L2 ioctl底层实现如 获取帧 图片 设置等
 }
 
-static int __init msm_v4l2_init(void)
+static int __init msm_v4l2_init(void)//msm v4l2 video设备注册
 {
 	int rc = -ENOMEM;
 	struct video_device *pvdev = NULL;
@@ -728,7 +728,7 @@ static int __init msm_v4l2_init(void)
 		return rc;
 	}
 
-	msm_v4l2_dev_init(pmsm_v4l2_dev);
+	msm_v4l2_dev_init(pmsm_v4l2_dev);//将
 
 	g_pmsm_v4l2_dev = pmsm_v4l2_dev;
 	g_pmsm_v4l2_dev->pvdev = pvdev;
@@ -741,7 +741,7 @@ static int __init msm_v4l2_init(void)
 		return rc;
 	}
 
-	rc = msm_v4l2_video_dev_init(pvdev);
+	rc = msm_v4l2_video_dev_init(pvdev);//填充v4l2 video_device结构体中函数
 	if (rc < 0) {
 		video_device_release(pvdev);
 		kfree(g_pmsm_v4l2_dev->drv);
