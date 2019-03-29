@@ -458,12 +458,12 @@ static int __video_register_device(struct video_device *vdev, int type, int nr,
 	spin_lock_init(&vdev->fh_lock);
 	INIT_LIST_HEAD(&vdev->fh_list);
 
-	/* Part 1: check device type */
+	/* Part 1: check device type */ //主设备和81
 	switch (type) {
-	case VFL_TYPE_GRABBER:
+	case VFL_TYPE_GRABBER://视频捕获设备如camera sensor 
 		name_base = "video";
 		break;
-	case VFL_TYPE_VBI:
+	case VFL_TYPE_VBI://vertical blank data information 利用垂直消隐传输字母等数据
 		name_base = "vbi";
 		break;
 	case VFL_TYPE_RADIO:
@@ -492,21 +492,21 @@ static int __video_register_device(struct video_device *vdev, int type, int nr,
 	 * of 128-191 and just pick the first free minor there
 	 * (new style). */
 	switch (type) {
-	case VFL_TYPE_GRABBER:
+	case VFL_TYPE_GRABBER: 
 		minor_offset = 0;
-		minor_cnt = 64;
+		minor_cnt = 64;//此设备号0-64
 		break;
 	case VFL_TYPE_RADIO:
 		minor_offset = 64;
-		minor_cnt = 64;
+		minor_cnt = 64;//次设备号64-128
 		break;
 	case VFL_TYPE_VBI:
 		minor_offset = 224;
-		minor_cnt = 32;
+		minor_cnt = 32;//次设备号224-256
 		break;
 	default:
 		minor_offset = 128;
-		minor_cnt = 64;
+		minor_cnt = 64;//次设备号128到192
 		break;
 	}
 #endif

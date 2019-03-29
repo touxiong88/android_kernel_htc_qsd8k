@@ -1957,7 +1957,7 @@ static int s5k3e2fx_test(enum msm_s_test_mode mo)
 }
 #endif
 
-static int s5k3e2fx_setting_INIT_EVT4(void)
+static int s5k3e2fx_setting_INIT_EVT4(void)//写初始化代码
 {
 	int rc = 0;
 	struct s5k3e2fx_i2c_reg_conf EVT4_INIT[] = {
@@ -2474,7 +2474,7 @@ static int s5k3e2fx_setting(enum msm_s_reg_update rupdate,
 			/*EVT4*/
 			s5k3e2fx_i2c_write_b(s5k3e2fx_client->addr,
 					REG_3150_RESERVED, 0x50);
-			s5k3e2fx_setting_INIT_EVT4();
+			s5k3e2fx_setting_INIT_EVT4();//sensor初始化代码
 		}
 		}
 		break; /* REG_INIT */
@@ -3080,7 +3080,7 @@ static int s5k3e2fx_set_default_focus(void)
 	return rc;
 }
 
-static int s5k3e2fx_move_focus(
+static int s5k3e2fx_move_focus(//对焦
 	int direction, int num_steps,int coarse_delay,int fine_delay,
 	int step_dir, int init_code_offset_max)
 {
@@ -3506,7 +3506,7 @@ static int s5k3e2fx_sensor_probe(struct msm_camera_sensor_info *info,
 	int rc = 0;
 	pr_info("%s\n", __func__);
 
-	rc = i2c_add_driver(&s5k3e2fx_i2c_driver);
+	rc = i2c_add_driver(&s5k3e2fx_i2c_driver);//注册I2C驱动
 	if (rc < 0 || s5k3e2fx_client == NULL) {
 		rc = -ENOTSUPP;
 		goto probe_fail;
@@ -3515,26 +3515,26 @@ static int s5k3e2fx_sensor_probe(struct msm_camera_sensor_info *info,
 	msm_camio_clk_rate_set(S5K3E2FX_DEF_MCLK);
 	msleep(20);
 
-	rc = s5k3e2fx_probe_init_sensor(info);
+	rc = s5k3e2fx_probe_init_sensor(info);//sensor初始化
 	if (rc < 0)
 		goto probe_fail;
 
 	/* lens correction */
-	s5k3e2fx_probe_init_lens_correction(info);
-	init_suspend();
+	s5k3e2fx_probe_init_lens_correction(info);//镜头马达初始化
+	init_suspend();//待机
 
 	s->s_init = s5k3e2fx_sensor_open_init;
 	s->s_release = s5k3e2fx_sensor_release;
-	s->s_config = s5k3e2fx_sensor_config;
+	s->s_config = s5k3e2fx_sensor_config;//配置sensor参数 用于preview capture record shutter white balance
 
 	/*register late resuem*/
 	register_early_suspend(&early_suspend_s5k3e2fx);
 	/*init wait event*/
-	init_waitqueue_head(&s5k3e2fx_event.event_wait);
+	init_waitqueue_head(&s5k3e2fx_event.event_wait);//等待唤醒
 	/*init waked_up value*/
 	s5k3e2fx_event.waked_up = 1;
 	/*write sysfs*/
-	s5k3e2fx_sysfs_init();
+	s5k3e2fx_sysfs_init();//注册sysfs
 
 	return rc;
 

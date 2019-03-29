@@ -1,0 +1,80 @@
+查看 git log -p arch/arm/configs/
+发现使用的是arch/arm/configs/evervolv_incrediblec_defconfig 
+CONFIG_ARCH_QSD8X50=y
+CONFIG_MSM_CAMERA=y
+CONFIG_OV8810=y
+CONFIG_S5K3E2FX
+
+sourceinsight 打开s5k3e2fx.c
+D:\android_kernel_htc_qsd8k\drivers\media\video\msm\s5k3e2fx.c
+static int __init s5k3e2fx_init(void)
+	platform_driver_register(&msm_camera_driver);
+		static struct platform_driver msm_camera_driver = {
+		.probe = __s5k3e2fx_probe,
+		.driver = {
+			.name = "msm_camera_s5k3e2fx",
+			.owner = THIS_MODULE,
+		},
+		.suspend = s5k3e2fx_suspend,
+			__s5k3e2fx_probe(struct platform_device *pdev)
+			return msm_camera_drv_start(pdev, s5k3e2fx_sensor_probe);
+			D:\android_kernel_htc_qsd8k\drivers\media\video\msm\msm_camera.c
+				msm_camera_drv_start(struct platform_device *dev,int (*sensor_probe)(struct msm_camera_sensor_info *,struct msm_sensor_ctrl *))
+					alloc_chrdev_region(&msm_devno, 0,3 * MSM_MAX_CAMERA_SENSORS,"msm_camera");
+					msm_class = class_create(THIS_MODULE, "msm_camera");
+					msm_device_init(pmsm, sync, camera_node);
+					msm_camera_sysfs_init(sync);
+					list_add(&sync->list, &msm_sensors);
+
+D:\android_kernel_htc_qsd8k\drivers\media\video\msm\msm_v4l2.c
+static int __init msm_v4l2_init(void)//msm v4l2 video设备注册
+	msm_v4l2_video_dev_init(pvdev);//填充v4l2 video_device结构体中函数
+		pvd->fops = &msm_v4l2_fops;
+			v4l2_file_operations msm_v4l2_fops = {
+				.owner = THIS_MODULE,
+				.open = msm_v4l2_open,
+				.poll = msm_v4l2_poll,
+				.release = msm_v4l2_release,
+				.ioctl = msm_v4l2_ioctl,
+					case MSM_V4L2_START_SNAPSHOT:
+					case MSM_V4L2_GET_PICTURE:
+					default:return video_ioctl2(filep, cmd, arg);
+		pvd->release = msm_v4l2_release_dev;
+		pvd->minor = -1;//自动分配次设备号
+		pvd->ioctl_ops = &msm_ioctl_ops;
+			struct v4l2_ioctl_ops msm_ioctl_ops = {
+				.vidioc_querycap = msm_v4l2_querycap,
+				.vidioc_s_std = msm_v4l2_s_std,
+
+				.vidioc_queryctrl = msm_v4l2_queryctrl,
+				.vidioc_g_ctrl = msm_v4l2_g_ctrl,
+				.vidioc_s_ctrl = msm_v4l2_s_ctrl,
+
+				.vidioc_reqbufs = msm_v4l2_reqbufs,
+				.vidioc_querybuf = msm_v4l2_querybuf,
+				.vidioc_qbuf = msm_v4l2_qbuf,
+				.vidioc_dqbuf = msm_v4l2_dqbuf,
+
+				.vidioc_streamon = msm_v4l2_streamon,
+				.vidioc_streamoff = msm_v4l2_streamoff,
+
+				.vidioc_enum_fmt_vid_overlay = msm_v4l2_enum_fmt_overlay,
+				.vidioc_enum_fmt_vid_cap = msm_v4l2_enum_fmt_cap,
+
+				.vidioc_try_fmt_vid_cap = msm_v4l2_try_fmt_cap,
+				.vidioc_try_fmt_type_private = mm_v4l2_try_fmt_type_private,
+
+				.vidioc_g_fmt_vid_cap = msm_v4l2_g_fmt_cap,
+				.vidioc_s_fmt_vid_cap = msm_v4l2_s_fmt_cap,
+				.vidioc_g_fmt_vid_overlay = msm_v4l2_g_fmt_overlay,
+				.vidioc_s_fmt_vid_overlay = msm_v4l2_s_fmt_overlay,
+				.vidioc_overlay = msm_v4l2_overlay,
+
+				.vidioc_g_jpegcomp = msm_v4l2_g_jpegcomp,
+				.vidioc_s_jpegcomp = msm_v4l2_s_jpegcomp,
+		return msm_v4l2_register(g_pmsm_v4l2_dev->drv);//注册MSM的V4L2 ioctl底层实现如 获取帧 图片 设置等
+	video_register_device(pvdev,VFL_TYPE_GRABBER, MSM_V4L2_DEVNUM_YUV))//注册V4L2设备根据类型分配设备号
+		D:\android_kernel_htc_qsd8k\drivers\media\video\v4l2-dev.c		
+		return __video_register_device(vdev, type, nr, 1);
+static int __init videodev_init(void)
+			
